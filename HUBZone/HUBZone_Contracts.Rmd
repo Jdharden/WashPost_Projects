@@ -1,0 +1,104 @@
+---
+title: "HUBZone Contract Analysis"
+author: "John D. Harden"
+date: "1/4/2019"
+output: html_document
+---
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+# Federal HUBZone Program Anaylsis
+# loading libraries 
+library (tidyverse)
+library (tidyverse)
+library (ggplot2)
+library (tidyr)
+library (dplyr)
+library (readr) 
+library (reshape)
+library(pivottabler)
+library(knitr)
+library(rmarkdown)
+library(lubridate)
+
+# loading data
+HUBZoneRaw <- read_csv("FPDS_Set_Aside_Contracts_97_18.csv", 
+                       col_types = cols(`Date Signed` = col_date(format = "%m/%d/%Y")))
+                       options(stringsAsFactors = TRUE)
+# parse year                       
+HUBZoneRaw$HUB_Year <- format(as.Date(HUBZoneRaw$`Date Signed`), "%Y")  
+
+```
+
+```
+head(FPDS_HUB_Database)
+str(FPDS_HUB_Database)
+summarize(FPDS_HUB_Database)
+glimpse(FPDS_HUB_Database)
+```
+
+A breakdown of contracts grouped by Global Vendor Name/DUNS number. Company names were  
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+
+# summarize data by top 30 vendors
+HUBsum <- HUBZoneRaw %>% group_by(`Global Vendor Name`) %>%
+  summarise(
+    AvgContract = mean(`Action Obligation ($)`, na.rm = TRUE), 
+    MedianContract = median(`Action Obligation ($)`, na.rm = TRUE),
+    TotalContract = sum(`Action Obligation ($)`, na.rm = TRUE),
+  )  %>%
+  top_n(15)
+
+HUBsum
+
+```
+
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# summarize data by top 15 vendors by year
+HUBYear <- HUBZoneRaw %>% group_by(`HUB_Year`) %>%
+  summarise(
+    AvgContract = mean(`Action Obligation ($)`, na.rm = TRUE), 
+    MedianContract = median(`Action Obligation ($)`, na.rm = TRUE),
+    TotalContract = sum(`Action Obligation ($)`, na.rm = TRUE),
+  )
+
+HUBYear
+
+```
+
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r echo=TRUE}
+
+library(ggplot2)
+# Graph data and reorder top 15 vendors
+ggplot(HUBsum, aes(x = HUBsum$TotalContract, y = reorder(HUBsum$'Global Vendor Name', HUBsum$TotalContract)  )) +
+  geom_point() +
+  labs( x = "Contract Amounts", y = "Vendors")
+
+```
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+
+```{r echo=TRUE}
+library(ggplot2)
+
+# graphing by year
+ggplot(HUBYear, aes(x = HUBYear$HUB_Year, y = HUBYear$TotalContract)) +
+  geom_col() +
+  labs( x = "Contract Amounts", y = "Vendors")
+
+```
+
+```{r echo=TRUE}
+
+```{r echo=TRUE}
