@@ -1,12 +1,3 @@
-
-library (tidyverse)
-library (ggplot2)
-library (tidyr)
-library (dplyr)
-library (readr) 
-library (reshape)
-library(pivottabler)
-
 head(FPDS_HUB_Database)
 str(FPDS_HUB_Database)
 summarize(FPDS_HUB_Database)
@@ -20,9 +11,6 @@ FPDSpivot <- FPDS_HUB_Database %>%
   summarise(TotalContract = sum(Action.Obligation....), 
             AvgContract = mean(Action.Obligation....,na.rm = TRUE),
             NumContracts = length(!is.na(Action.Obligation....)))
-
-View(FPDSpivot)
-
 
 FPDS_HUB_Database %>% group_by(Vendor.Name,) %>%
   count() %>%
@@ -43,10 +31,6 @@ vendors <- FPDS_HUB_Database %>% group_by(Vendor.Name) %>%
     TotalContract = sum(Action.Obligation...., na.rm = TRUE),
   )  %>%
   top_n(30)
-
-
-str(vendors)
-View(vendors)
 
 ggplot(vendors, aes(x = TotalContract, y = reorder(Vendor.Name, TotalContract)  )) +
   geom_point() +
